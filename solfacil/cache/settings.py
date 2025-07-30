@@ -5,7 +5,7 @@ from pydantic.types import PositiveInt
 from pydantic_settings import BaseSettings
 
 
-class RedisClusterSettings(BaseSettings, extra="ignore"):
+class RedisClusterSettings(BaseSettings):
     host: str = Field(
         default="localhost",
         description="Redis cluster host address"
