@@ -1,10 +1,11 @@
 
 from typing import Optional, List
-from pydantic import BaseSettings, Field
+from pydantic import Field
 from pydantic.types import PositiveInt
+from pydantic_settings import BaseSettings
 
 
-class RedisClusterSettings(BaseSettings):
+class RedisClusterSettings(BaseSettings, extra="ignore"):
     host: str = Field(
         default="localhost",
         description="Redis cluster host address"
