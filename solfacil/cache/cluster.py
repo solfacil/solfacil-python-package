@@ -1,6 +1,6 @@
 import logging
 
-from redis.asyncio.connection import ClusterConnectionPool
+from redis.asyncio.connection import ConnectionPool
 from redis.asyncio.cluster import RedisCluster
 from redis.exceptions import RedisError, ConnectionError
 
@@ -32,11 +32,11 @@ class RedisClusterAdapter:
         self.port = port
         self.max_connections = max_connections
         
-        self._pool: ClusterConnectionPool | None = None
+        self._pool: ConnectionPool | None = None
         self._redis: RedisCluster | None = None
     
-    def __create_cluster_connection_pool(self) -> ClusterConnectionPool:
-        return ClusterConnectionPool(
+    def __create_cluster_connection_pool(self) -> ConnectionPool:
+        return ConnectionPool(
             host=self.host,
             port=self.port,
             max_connections=self.max_connections,
