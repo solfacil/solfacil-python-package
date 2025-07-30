@@ -1,4 +1,5 @@
 import logging
+from contextlib import asynccontextmanager
 
 from redis.asyncio.connection import ConnectionPool
 from redis.asyncio.cluster import RedisCluster
@@ -54,8 +55,12 @@ class RedisClusterAdapter:
         self._pool = self.__create_cluster_connection_pool()
         self._redis = self.__create_cluster_connection()
     
-    async def get_session(self) -> RedisCluster:
-        return self._redis
+    @asynccontextmanager
+    async def get_session(self):
+        try:
+            yield self._redis
+        finally:
+            pass
 
     async def disconnect(self) -> None:
         if self._redis:
