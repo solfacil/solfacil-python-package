@@ -1,7 +1,5 @@
-
 from typing import Any
 
-from redis.exceptions import RedisError, ConnectionError
 from redis.asyncio.cluster import RedisCluster
 from redis.asyncio.client import Redis
 
@@ -28,9 +26,9 @@ class CacheRepository:
     async def ttl(self, key: str) -> int:
         return await self._cache_session.ttl(key)
     
-    async def healthcheck(self) -> bool:
+    async def healthcheck(self) -> tuple[bool, str | None]:
         try:
             await self._cache_session.ping()
-            return True
-        except (RedisError, ConnectionError):
-            return False
+            return True, None
+        except Exception as e:
+            return False, str(e)
