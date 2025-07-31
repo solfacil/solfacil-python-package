@@ -1,12 +1,13 @@
 
 from typing import Any
-from .cluster import CacheRedisAdapter
 
 from redis.exceptions import RedisError, ConnectionError
+from redis.asyncio.cluster import RedisCluster
+from redis.asyncio.client import Redis
 
 
 class CacheRepository:
-    def __init__(self, cache_session: CacheRedisAdapter) -> None:
+    def __init__(self, cache_session: RedisCluster | Redis) -> None:
         self._cache_session = cache_session
     
     async def set(self, key: str, value: Any) -> bool:
