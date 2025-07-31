@@ -1,29 +1,35 @@
 
 from typing import Any
-from .cluster import RedisClusterAdapter
+from .cluster import CacheRedisAdapter
+
+from redis.exceptions import RedisError, ConnectionError
 
 
 class CacheRepository:
-    def __init__(self, adapter: RedisClusterAdapter) -> None:
-        self._cache = adapter
+    def __init__(self, cache_session: CacheRedisAdapter) -> None:
+        self._cache_session = cache_session
     
     async def set(self, key: str, value: Any) -> bool:
-        return await self._cache.set(key, value)
+        return await self._cache_session.set(key, value)
     
     async def get(self, key: str) -> None | Any:
-        return await self._cache.get(key)
+        return await self._cache_session.get(key)
     
     async def delete(self, keys: list[str]) -> int:
-        return await self._cache.delete(keys)
+        return await self._cache_session.delete(keys)
     
     async def exists(self, keys: list[str]) -> int:
-        return await self._cache.exists(keys)
+        return await self._cache_session.exists(keys)
     
     async def expire(self, key: str, time: int) -> bool:
-        return await self._cache.expire(key, time)
+        return await self._cache_session.expire(key, time)
     
     async def ttl(self, key: str) -> int:
-        return await self._cache.ttl(key)
+        return await self._cache_session.ttl(key)
     
     async def healthcheck(self) -> bool:
-        return await self._cache.healthcheck()
+        try:
+            await self._cache_session.ping()
+            return True
+        except (RedisError, ConnectionError):
+            return False
