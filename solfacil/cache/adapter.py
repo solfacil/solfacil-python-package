@@ -27,6 +27,7 @@ class CacheRedisAdapter:
     def config(cls) -> "CacheRedisAdapter":
         cache_mode_settings = CacheRedisModeSettings()
         cache_adapter_settings = cls.__get_config(cache_mode_settings)
+        logger.info(f"[ADAPTER][CACHE Connection {cache_adapter_settings.build_uri} - Max Connections: {cache_adapter_settings.max_connections}]")
         return cls(cache_adapter_settings)
         
     def __init__(self, settings: CacheRedisClusterSettings | CacheRedisSingleNodeSettings) -> None:
@@ -68,9 +69,11 @@ class CacheRedisAdapter:
         return single_node_config
     
     def __create_cluster_connection(self) -> RedisCluster:
+        logger.info(f"[ADAPTER][CACHE CONNECTION MODE: {CacheRedisMode.CLUSTER.value.upper()}]")
         return RedisCluster(self.cluster_config)
     
     def __create_single_node_connection(self) -> Redis:
+        logger.info(f"[ADAPTER][CACHE CONNECTION MODE: {CacheRedisMode.SINGLE_NODE.value.upper()}]")
         return Redis(self.single_node_config)
     
     async def connect(self) -> None:
@@ -79,11 +82,13 @@ class CacheRedisAdapter:
             if self._settings.deployment_mode == CacheRedisMode.CLUSTER 
             else self.__create_single_node_connection()
         )
+        logger.info(f"[ADAPTER][CACHE CONECTION STATUS: {await self._redis.ping()}]")
 
     async def disconnect(self) -> None:
         if self._redis:
             await self._redis.close()
             self._redis = None
+            logger.info("[ADAPTER][CACHE DISCONNECTED]")
 
     @asynccontextmanager
     async def get_session(self):
