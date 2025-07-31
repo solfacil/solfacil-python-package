@@ -62,6 +62,10 @@ class CacheRedisSettings(CacheRedisModeSettings):
         description="Maximum number of retry attempts",
         validation_alias="CACHE_RETRY_MAX_ATTEMPTS"
     )
+    
+    @property
+    def build_uri(self) -> str:
+        return f"redis://{self.host}:{self.port}/{self.db}"
 
 
 class CacheRedisClusterSettings(CacheRedisSettings):
