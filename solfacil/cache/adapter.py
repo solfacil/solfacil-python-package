@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from redis.asyncio.cluster import RedisCluster
-from redis.asyncio.connection import Redis
+from redis.asyncio.client import Redis
 from redis.asyncio.retry import Retry
 from redis.backoff import ExponentialBackoff
 
@@ -26,8 +26,8 @@ class CacheRedisAdapter:
     @classmethod
     def config(cls) -> "CacheRedisAdapter":
         cache_mode_settings = CacheRedisModeSettings()
-        cache_config = cls.__get_config(cache_mode_settings)
-        return cls(cache_config)
+        cache_adapter_settings = cls.__get_config(cache_mode_settings)
+        return cls(cache_adapter_settings)
         
     def __init__(self, settings: CacheRedisClusterSettings | CacheRedisSingleNodeSettings) -> None:
         self._redis: RedisCluster | Redis | None = None
