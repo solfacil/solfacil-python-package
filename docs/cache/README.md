@@ -1,6 +1,8 @@
 
 # Python Cache - Redis Adapter
 
+[Redis Documentation](https://redis.readthedocs.io/en/stable/index.html#)
+
 ## Usage
 
 ```python
@@ -48,3 +50,55 @@ async def example(
     service = ExampleService(CacheRepository(cache_session))
     return await service.process()
 ```
+
+Expected logs for Single Node configuration
+
+```bash
+application        | INFO:     Started server process [1]
+application        | INFO:     Waiting for application startup.
+application        | INFO:solfacil.cache.adapter:[ADAPTER][CACHE][CONNECTION MODE: SINGLE_NODE]
+application        | INFO:solfacil.cache.adapter:[ADAPTER][CACHE][CONNECTION STATUS: True]
+application        | INFO:     Application startup complete.
+application        | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+```
+
+Expectec logs for Cluster configuration
+
+```bash
+application        | INFO:     Started server process [1]
+application        | INFO:     Waiting for application startup.
+application        | INFO:solfacil.cache.adapter:[ADAPTER][CACHE][CONNECTION MODE: CLUSTER]
+application        | INFO:solfacil.cache.adapter:[ADAPTER][CACHE][CONNECTION STATUS: True]
+application        | INFO:     Application startup complete.
+application        | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+```
+
+## Configuration
+
+### Common Parameters
+
+| Parameter              | Environment Variable         | Definition                                |
+|------------------------|------------------------------|-------------------------------------------|
+| host                   | CACHE_HOST                   | Redis cluster host address                |
+| port                   | CACHE_PORT                   | Redis cluster port number                 |
+| db                     | CACHE_DB                     | Redis database number (0-15)              |
+| max_connections        | CACHE_MAX_CONNECTIONS        | Maximum number of connections in the pool |
+| socket_timeout         | CACHE_SOCKET_TIMEOUT         | Socket timeout in seconds                 |
+| socket_connect_timeout | CACHE_SOCKET_CONNECT_TIMEOUT | Socket connection timeout in seconds      |
+| socket_keepalive       | CACHE_SOCKET_KEEPALIVE       | Enable socket keepalive                   |
+| health_check_interval  | CACHE_HEALTH_CHECK_INTERVAL  | Health check interval in seconds          |
+| retry_max_attempts     | CACHE_RETRY_MAX_ATTEMPTS     | Maximum number of retry attempts          |
+
+### Cluster Specific Parameters
+
+| Parameter                    | Environment Variable               | Definition                                |
+|------------------------------|------------------------------------|-------------------------------------------|
+| read_from_replicas           | CACHE_READ_FROM_REPLICAS           | Allow reading from replica nodes          |
+| require_full_coverage        | CACHE_REQUIRE_FULL_COVERAGE        | Require full cluster coverage             |
+| cluster_error_retry_attempts | CACHE_CLUSTER_ERROR_RETRY_ATTEMPTS | Number of times to retry on cluster error |
+
+### Single Node Specific Parameters
+
+| Parameter        | Environment Variable    | Definition                |
+|------------------|-------------------------|---------------------------|
+| retry_on_timeout | CACHE_RETRY_ON_TIMEOUT  | Retry commands on timeout |
