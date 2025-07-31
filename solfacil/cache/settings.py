@@ -1,11 +1,20 @@
 
-from typing import Optional, List
 from pydantic import Field
 from pydantic.types import PositiveInt
 from pydantic_settings import BaseSettings
 
+from .constants import CacheRedisMode
 
-class RedisClusterSettings(BaseSettings):
+
+class CacheRedisModeSettings(BaseSettings):
+    deployment_mode: CacheRedisMode = Field(
+        default=...,
+        description="Redis mode",
+        validation_alias="CACHE_DEPLOYMENT_MODE"
+    )
+
+
+class CacheRedisSettings(BaseSettings):
     host: str = Field(
         default=...,
         description="Redis cluster host address",
@@ -23,20 +32,11 @@ class RedisClusterSettings(BaseSettings):
         description="Redis database number (0-15)",
         validation_alias="CACHE_DB"
     )
-    
-    # Connection Pool Settings
     max_connections: PositiveInt = Field(
         default=10,
         description="Maximum number of connections in the pool",
         validation_alias="CACHE_MAX_CONNECTIONS"
     )
-    min_connections: PositiveInt = Field(
-        default=1,
-        description="Minimum number of connections in the pool",
-        validation_alias="CACHE_MIN_CONNECTIONS"
-    )
-    
-    # Connection timeout settings
     socket_timeout: PositiveInt = Field(
         default=5,
         description="Socket timeout in seconds",
@@ -52,51 +52,39 @@ class RedisClusterSettings(BaseSettings):
         description="Enable socket keepalive",
         validation_alias="CACHE_SOCKET_KEEPALIVE"
     )
-    
-    # Cluster-specific settings
-    decode_responses: bool = Field(
-        default=True,
-        description="Automatically decode responses to strings",
-        validation_alias="CACHE_DECODE_RESPONSES"
-    )
     health_check_interval: PositiveInt = Field(
         default=30,
         description="Health check interval in seconds",
         validation_alias="CACHE_HEALTH_CHECK_INTERVAL"
     )
-    retry_on_timeout: bool = Field(
-        default=True,
-        description="Retry commands on timeout",
-        validation_alias="CACHE_RETRY_ON_TIMEOUT"
+    retry_max_attempts: PositiveInt = Field(
+        default=3,
+        description="Maximum number of retry attempts",
+        validation_alias="CACHE_RETRY_MAX_ATTEMPTS"
     )
-    # retry_on_error: List[str] = Field(
-    #     default=["ConnectionError", "TimeoutError"],
-    #     description="List of error types to retry on"
-    # )
-    # max_attempts: PositiveInt = Field(
-    #     default=3,
-    #     description="Maximum number of retry attempts"
-    # )
-    
-    # Cluster discovery settings
-    cluster_nodes: Optional[List[str]] = Field(
-        default=None,
-        description="List of cluster node addresses (host:port)",
-        validation_alias="CACHE_CLUSTER_NODES"
-    )
-    skip_full_coverage_check: bool = Field(
-        default=False,
-        description="Skip full cluster coverage check"
-    )
-    
-    # Performance settings
+
+
+class CacheRedisClusterSettings(CacheRedisSettings):
     read_from_replicas: bool = Field(
         default=False,
         description="Allow reading from replica nodes",
         validation_alias="CACHE_READ_FROM_REPLICAS"
     )
-    readonly: bool = Field(
+    require_full_coverage: bool = Field(
         default=False,
-        description="Set connection to read-only mode",
-        validation_alias="CACHE_READONLY"
+        description="Require full cluster coverage",
+        validation_alias="CACHE_REQUIRE_FULL_COVERAGE"
+    )
+    cluster_error_retry_attempts: PositiveInt = Field(
+        default=2,
+        description="Number of times to retry on cluster error",
+        validation_alias="CACHE_CLUSTER_ERROR_RETRY_ATTEMPTS"
+    )
+
+
+class CacheRedisSingleNodeSettings(CacheRedisSettings):
+    retry_on_timeout: bool = Field(
+        default=True,
+        description="Retry commands on timeout",
+        validation_alias="CACHE_RETRY_ON_TIMEOUT"
     )
