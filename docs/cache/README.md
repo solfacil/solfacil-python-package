@@ -18,7 +18,7 @@ async def get_cache_session():
 
 ```python
 # app.py
-from adapters.cache.settings import cache_redis_adapter
+from cache import cache_redis_adapter
 
 async def lifespan(app: FastAPI):
     await cache_redis_adapter.connect()
@@ -39,7 +39,7 @@ app = application()
 from fastapi import APIRouter, Depends
 from solfacil.cache import CacheRepository
 
-from adapters.cache.settings import get_cache_session
+from cache import get_cache_session
 
 router = APIRouter()
 
