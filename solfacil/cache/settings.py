@@ -14,7 +14,7 @@ class CacheRedisModeSettings(BaseSettings):
     )
 
 
-class CacheRedisSettings(BaseSettings):
+class CacheRedisSettings(CacheRedisModeSettings):
     host: str = Field(
         default=...,
         description="Redis cluster host address",
