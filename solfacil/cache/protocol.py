@@ -1,8 +1,12 @@
-from typing import Protocol, Any
+from typing import Any, Protocol, runtime_checkable
+
+from redis.asyncio.cluster import RedisCluster
+from redis.asyncio.client import Redis
 
 
-class CacheProtocol(Protocol):
-    def __init__(self, adapter) -> None:
+@runtime_checkable
+class CacheRepositoryProtocol(Protocol):
+    def __init__(self, cache_session: RedisCluster | Redis) -> None:
         ...
     
     async def set(self, key: str, value: Any) -> bool:
@@ -23,5 +27,5 @@ class CacheProtocol(Protocol):
     async def ttl(self, key: str) -> int:
         ...
     
-    async def healthcheck(self) -> bool:
+    async def healthcheck(self) -> tuple[bool, str | None]:
         ...
