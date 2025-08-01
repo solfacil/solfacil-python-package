@@ -90,12 +90,29 @@ class CacheRedisAdapter:
             else self.__create_single_node_connection_pool()
         )
         logger.info(f"[ADAPTER][CACHE][CONNECTION ACTIVE: {await self._redis.ping()}]")
-
-    async def disconnect(self) -> None:
+    
+    async def __disconnect_cluster_connection(self) -> None:
+        if self._redis:
+            await self._redis.aclose()
+            self._redis = None
+            logger.info("[ADAPTER][CACHE][DISCONNECTED]")
+    
+    async def __disconnect_single_node_connection(self) -> None:
         if self._redis:
             await self._redis.close()
             self._redis = None
             logger.info("[ADAPTER][CACHE][DISCONNECTED]")
+        
+        if self._connection_pool:
+            await self._connection_pool.aclose()
+            self._connection_pool = None
+            logger.info("[ADAPTER][CACHE][CONNECTION POOL CLOSED]")
+
+    async def disconnect(self) -> None:
+        if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
+            await self.__disconnect_cluster_connection()
+        else:
+            await self.__disconnect_single_node_connection()
 
     @asynccontextmanager
     async def get_session(self):
