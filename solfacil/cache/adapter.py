@@ -34,6 +34,7 @@ class CacheRedisAdapter:
         
     def __init__(self, settings: CacheRedisClusterSettings | CacheRedisSingleNodeSettings) -> None:
         self._connection_pool: ConnectionPool | None = None
+        self._single_node_connection: Redis | None = None
         self._cluster_connection: RedisCluster | None = None
         self._settings = settings
         
@@ -54,7 +55,6 @@ class CacheRedisAdapter:
             'socket_connect_timeout': self._settings.socket_connect_timeout,
             'max_connections': self._settings.max_connections,
             'health_check_interval': self._settings.health_check_interval,
-            # **self.__retry_config,
         }
         return common_config
     
@@ -79,6 +79,7 @@ class CacheRedisAdapter:
         
     def __create_single_node_connection(self) -> Redis:
         self._connection_pool = ConnectionPool(**self.single_node_config)
+        self._single_node_connection = Redis(connection_pool=self._connection_pool)
         # logger.info(f"[ADAPTER][CACHE][CONNECTION POOL ACTIVE: {self._connection_pool.can_get_connection()}]")
          
     async def connect(self) -> None:
@@ -98,6 +99,7 @@ class CacheRedisAdapter:
         if self._connection_pool:
             await self._connection_pool.aclose()
             self._connection_pool = None
+            self._single_node_connection = None
 
     async def disconnect(self) -> None:
         if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
@@ -111,7 +113,7 @@ class CacheRedisAdapter:
         redis_connection = (
             self._cluster_connection
             if self._settings.deployment_mode == CacheRedisMode.CLUSTER
-            else Redis(connection_pool=self._connection_pool)
+            else self._single_node_connection
             # return Redis.from_pool(self._connection_pool)
         )
         async with redis_connection as session:
