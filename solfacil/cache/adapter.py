@@ -76,7 +76,7 @@ class CacheRedisAdapter:
         
     def __create_single_node_connection(self) -> Redis:
         self._connection_pool = ConnectionPool(**self.single_node_config)
-        logger.info(f"[ADAPTER][CACHE][CONNECTION POOL ACTIVE: {self._connection_pool.can_get_connection()}]")
+        # logger.info(f"[ADAPTER][CACHE][CONNECTION POOL ACTIVE: {self._connection_pool.can_get_connection()}]")
          
     async def connect(self) -> None:
         if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
@@ -108,6 +108,7 @@ class CacheRedisAdapter:
             return self._cluster_connection
         else:
             return Redis(connection_pool=self._connection_pool)
+            # return Redis.from_pool(self._connection_pool)
 
     @asynccontextmanager
     async def get_session(self):
