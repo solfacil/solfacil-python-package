@@ -85,6 +85,7 @@ class CacheRedisAdapter:
         if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
             self.__create_cluster_connection()
             logger.info(f"[ADAPTER][CACHE][CLUSTER CONNECTION ACTIVE: {await self._cluster_connection.ping()}]")
+            logger.info(f"[ADAPTER][CACHE][CLUSTER NODES: {self._cluster_connection.get_nodes()}]")
         else:
             self.__create_single_node_connection()
         
@@ -105,15 +106,13 @@ class CacheRedisAdapter:
             await self.__disconnect_single_node_connection()
         logger.info("[ADAPTER][CACHE][DISCONNECTED]")
     
-    @property
-    def __redis_connection(self) -> RedisCluster | Redis:
-        if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
-            return self._cluster_connection
-        else:
-            return Redis(connection_pool=self._connection_pool)
-            # return Redis.from_pool(self._connection_pool)
-
     @asynccontextmanager
     async def get_session(self):
-        async with self.__redis_connection as session:
+        redis_connection = (
+            self._cluster_connection
+            if self._settings.deployment_mode == CacheRedisMode.CLUSTER
+            else Redis(connection_pool=self._connection_pool)
+            # return Redis.from_pool(self._connection_pool)
+        )
+        async with redis_connection as session:
             yield session
