@@ -28,11 +28,11 @@ class CacheRedisAdapter:
     def config(cls) -> "CacheRedisAdapter":
         cache_mode_settings = CacheRedisModeSettings()
         cache_adapter_settings = cls.__get_config(cache_mode_settings)
-        logger.info(f"[ADAPTER][CACHE COMMECTION URI: {cache_adapter_settings.build_uri}]")
+        logger.info(f"[ADAPTER][CACHE][URI: {cache_adapter_settings.build_uri}]")
+        logger.info(f"[ADAPTER][CACHE][CONNECTION MODE: {cache_adapter_settings.deployment_mode.value.upper()}]")
         return cls(cache_adapter_settings)
         
     def __init__(self, settings: CacheRedisClusterSettings | CacheRedisSingleNodeSettings) -> None:
-        logger.info("[ADAPTER][CACHE CREATED]")
         self._connection_pool: ConnectionPool | None = None
         self._cluster_connection: RedisCluster | None = None
         self._settings = settings
@@ -72,20 +72,18 @@ class CacheRedisAdapter:
         return single_node_config
     
     def __create_cluster_connection(self) -> RedisCluster:
-        logger.info(f"[ADAPTER][CACHE][CONNECTION MODE: {CacheRedisMode.CLUSTER.value.upper()}]")
         self._cluster_connection = RedisCluster(**self.cluster_config)
-        logger.info(f"[ADAPTER][CACHE][CONNECTION ACTIVE: {await self._cluster_connection.ping()}]")
         
     def __create_single_node_connection(self) -> Redis:
-        logger.info(f"[ADAPTER][CACHE][CONNECTION MODE: {CacheRedisMode.SINGLE_NODE.value.upper()}]")
         self._connection_pool = ConnectionPool(**self.single_node_config)
-        logger.info(f"[ADAPTER][CACHE][CONNECTION POOL: {self._settings.max_connections}]")
-            
+        logger.info(f"[ADAPTER][CACHE][CONNECTION POOL ACTIVE: {self._connection_pool.can_get_connection()}]")
+         
     async def connect(self) -> None:
         if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
-            await self.__create_cluster_connection() 
+            self.__create_cluster_connection()
+            logger.info(f"[ADAPTER][CACHE][CLUSTER CONNECTION ACTIVE: {await self._cluster_connection.ping()}]")
         else:
-            await self.__create_single_node_connection()
+            self.__create_single_node_connection()
         
     async def __disconnect_cluster_connection(self) -> None:
         if self._cluster_connection:
