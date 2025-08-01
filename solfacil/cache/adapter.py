@@ -87,7 +87,7 @@ class CacheRedisAdapter:
         self._redis = (
             self.__create_cluster_connection() 
             if self._settings.deployment_mode == CacheRedisMode.CLUSTER 
-            else self.__create_single_node_connection()
+            else self.__create_single_node_connection_pool()
         )
         logger.info(f"[ADAPTER][CACHE][CONNECTION ACTIVE: {await self._redis.ping()}]")
 
