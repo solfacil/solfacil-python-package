@@ -79,11 +79,6 @@ class CacheRedisClusterSettings(CacheRedisSettings):
         description="Require full cluster coverage",
         validation_alias="CACHE_REQUIRE_FULL_COVERAGE"
     )
-    cluster_error_retry_attempts: PositiveInt = Field(
-        default=2,
-        description="Number of times to retry on cluster error",
-        validation_alias="CACHE_CLUSTER_ERROR_RETRY_ATTEMPTS"
-    )
 
 
 class CacheRedisSingleNodeSettings(CacheRedisSettings):

@@ -59,7 +59,6 @@ class CacheRedisAdapter:
         cluster_config = {
             **self._common_config,
             'require_full_coverage': self._settings.require_full_coverage,
-            'cluster_error_retry_attempts': self._settings.cluster_error_retry_attempts,
         }
         return cluster_config
 
