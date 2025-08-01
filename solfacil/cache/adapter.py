@@ -34,7 +34,7 @@ class CacheRedisAdapter:
     def __init__(self, settings: CacheRedisClusterSettings | CacheRedisSingleNodeSettings) -> None:
         logger.info("[ADAPTER][CACHE CREATED]")
         self._connection_pool: ConnectionPool | None = None
-        self._redis: RedisCluster | Redis | None = None
+        self._cluster_connection: RedisCluster | None = None
         self._settings = settings
     
     @property
@@ -73,48 +73,45 @@ class CacheRedisAdapter:
     
     def __create_cluster_connection(self) -> RedisCluster:
         logger.info(f"[ADAPTER][CACHE][CONNECTION MODE: {CacheRedisMode.CLUSTER.value.upper()}]")
-        return RedisCluster(**self.cluster_config)
-    
-    def __create_single_node_connection_pool(self):
-        logger.info(f"[ADAPTER][CACHE][CONNECTION POOL: {self._settings.max_connections}]")
-        self._connection_pool = ConnectionPool(**self.single_node_config)
-    
+        self._cluster_connection = RedisCluster(**self.cluster_config)
+        logger.info(f"[ADAPTER][CACHE][CONNECTION ACTIVE: {await self._cluster_connection.ping()}]")
+        
     def __create_single_node_connection(self) -> Redis:
         logger.info(f"[ADAPTER][CACHE][CONNECTION MODE: {CacheRedisMode.SINGLE_NODE.value.upper()}]")
-        return Redis(connection_pool=self._connection_pool)
-    
+        self._connection_pool = ConnectionPool(**self.single_node_config)
+        logger.info(f"[ADAPTER][CACHE][CONNECTION POOL: {self._settings.max_connections}]")
+            
     async def connect(self) -> None:
-        self._redis = (
-            self.__create_cluster_connection() 
-            if self._settings.deployment_mode == CacheRedisMode.CLUSTER 
-            else self.__create_single_node_connection_pool()
-        )
-        logger.info(f"[ADAPTER][CACHE][CONNECTION ACTIVE: {await self._redis.ping()}]")
-    
-    async def __disconnect_cluster_connection(self) -> None:
-        if self._redis:
-            await self._redis.aclose()
-            self._redis = None
-            logger.info("[ADAPTER][CACHE][DISCONNECTED]")
-    
-    async def __disconnect_single_node_connection(self) -> None:
-        if self._redis:
-            await self._redis.close()
-            self._redis = None
-            logger.info("[ADAPTER][CACHE][DISCONNECTED]")
+        if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
+            await self.__create_cluster_connection() 
+        else:
+            await self.__create_single_node_connection()
         
+    async def __disconnect_cluster_connection(self) -> None:
+        if self._cluster_connection:
+            await self._cluster_connection.aclose()
+            self._cluster_connection = None
+            
+    async def __disconnect_single_node_connection(self) -> None:
         if self._connection_pool:
             await self._connection_pool.aclose()
             self._connection_pool = None
-            logger.info("[ADAPTER][CACHE][CONNECTION POOL CLOSED]")
 
     async def disconnect(self) -> None:
         if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
             await self.__disconnect_cluster_connection()
         else:
             await self.__disconnect_single_node_connection()
+        logger.info("[ADAPTER][CACHE][DISCONNECTED]")
+    
+    @property
+    def __redis_connection(self) -> RedisCluster | Redis:
+        if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
+            return self._cluster_connection
+        else:
+            return Redis(connection_pool=self._connection_pool)
 
     @asynccontextmanager
     async def get_session(self):
-        async with self._redis as session:
+        async with self.__redis_connection as session:
             yield session
