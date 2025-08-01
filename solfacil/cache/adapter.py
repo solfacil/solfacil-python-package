@@ -28,7 +28,7 @@ class CacheRedisAdapter:
     def config(cls) -> "CacheRedisAdapter":
         cache_mode_settings = CacheRedisModeSettings()
         cache_adapter_settings = cls.__get_config(cache_mode_settings)
-        logger.info(f"[ADAPTER][CACHE][URI: {cache_adapter_settings.build_uri}]")
+        logger.info(f"[ADAPTER][CACHE][CONNECTION URI: {cache_adapter_settings.build_uri}]")
         logger.info(f"[ADAPTER][CACHE][CONNECTION MODE: {cache_adapter_settings.deployment_mode.value.upper()}]")
         return cls(cache_adapter_settings)
         
@@ -39,11 +39,12 @@ class CacheRedisAdapter:
         self._settings = settings
         
     @property
-    def __retry_config(self) -> dict[str, Any]:
-        return {
+    def _retry_config(self) -> dict[str, Any]:
+        retry_config = {
             'retry': Retry(ExponentialBackoff(), retries=2),
             'retry_on_error': [ConnectionError, TimeoutError],
         }
+        return retry_config
     
     @property
     def _common_config(self) -> dict[str, Any]:
@@ -78,8 +79,9 @@ class CacheRedisAdapter:
         self._cluster_connection = RedisCluster(**self.cluster_config)
         
     def __create_single_node_connection(self) -> Redis:
-        self._connection_pool = ConnectionPool(**self.single_node_config)
-        self._single_node_connection = Redis(connection_pool=self._connection_pool)
+        # self._connection_pool = ConnectionPool(**self.single_node_config)
+        # self._single_node_connection = Redis(connection_pool=self._connection_pool)
+        self._single_node_connection = Redis(**self.single_node_config)
         # logger.info(f"[ADAPTER][CACHE][CONNECTION POOL ACTIVE: {self._connection_pool.can_get_connection()}]")
          
     async def connect(self) -> None:
