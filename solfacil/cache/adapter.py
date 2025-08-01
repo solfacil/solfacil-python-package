@@ -36,11 +36,16 @@ class CacheRedisAdapter:
         self._connection_pool: ConnectionPool | None = None
         self._cluster_connection: RedisCluster | None = None
         self._settings = settings
+        
+    @property
+    def __retry_config(self) -> dict[str, Any]:
+        return {
+            'retry': Retry(ExponentialBackoff(), retries=2),
+            'retry_on_error': [ConnectionError, TimeoutError],
+        }
     
     @property
     def _common_config(self) -> dict[str, Any]:
-        retry_config = Retry(ExponentialBackoff(), retries=2)
-        
         common_config = {
             'host': self._settings.host,
             'port': self._settings.port,
@@ -49,8 +54,7 @@ class CacheRedisAdapter:
             'socket_connect_timeout': self._settings.socket_connect_timeout,
             'max_connections': self._settings.max_connections,
             'health_check_interval': self._settings.health_check_interval,
-            'retry': retry_config,
-            'retry_on_error': [ConnectionError, TimeoutError],
+            # **self.__retry_config,
         }
         return common_config
     
