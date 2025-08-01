@@ -6,6 +6,7 @@ from redis.asyncio.cluster import RedisCluster
 from redis.asyncio.client import Redis
 from redis.asyncio.retry import Retry
 from redis.backoff import ExponentialBackoff
+from redis.connection import ConnectionPool
 
 from .settings import CacheRedisClusterSettings, CacheRedisModeSettings, CacheRedisSingleNodeSettings
 from .constants import CacheRedisMode
@@ -32,6 +33,7 @@ class CacheRedisAdapter:
         
     def __init__(self, settings: CacheRedisClusterSettings | CacheRedisSingleNodeSettings) -> None:
         logger.info("[ADAPTER][CACHE CREATED]")
+        self._connection_pool: ConnectionPool | None = None
         self._redis: RedisCluster | Redis | None = None
         self._settings = settings
     
@@ -74,11 +76,12 @@ class CacheRedisAdapter:
         return RedisCluster(**self.cluster_config)
     
     def __create_single_node_connection_pool(self):
-        pass
+        logger.info(f"[ADAPTER][CACHE][CONNECTION POOL: {self._settings.max_connections}]")
+        self._connection_pool = ConnectionPool(**self.single_node_config)
     
     def __create_single_node_connection(self) -> Redis:
         logger.info(f"[ADAPTER][CACHE][CONNECTION MODE: {CacheRedisMode.SINGLE_NODE.value.upper()}]")
-        return Redis(**self.single_node_config)
+        return Redis(connection_pool=self._connection_pool)
     
     async def connect(self) -> None:
         self._redis = (
