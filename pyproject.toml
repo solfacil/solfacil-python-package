@@ -26,8 +26,5 @@ include = [
     "src"
 ]
 
-[tool.hatch.build.targets.wheel.packages]
-src = "src"
-
 [project.optional-dependencies]
 cache = ["cache"]
