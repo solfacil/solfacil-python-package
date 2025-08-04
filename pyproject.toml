@@ -6,7 +6,10 @@ build-backend = "hatchling.build"
 name = "solkit"
 version = "0.1.0"
 description = "Solfacil Python packages and tools"
-
+authors = [
+    {name = "Solfacil", email = "dev@solfacil.com.br"}
+]
+readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "redis>=6.2.0",
@@ -15,10 +18,16 @@ dependencies = [
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "solkit"
+    "src"
 ]
 
 [tool.hatch.build.targets.wheel]
 include = [
-    "solkit"
+    "src"
 ]
+
+[tool.hatch.build.targets.wheel.packages]
+src = "src"
+
+[project.optional-dependencies]
+cache = ["cache"]
