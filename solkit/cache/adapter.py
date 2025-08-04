@@ -85,7 +85,7 @@ class CacheRedisAdapter:
         self._cluster_connection = RedisCluster(**self.__cluster_config)
         
     def __create_single_node_connection(self) -> Redis:
-        self._connection_pool = ConnectionPool(**self.single_node_config)
+        self._connection_pool = ConnectionPool(**self.__single_node_config)
         self._single_node_connection = Redis(connection_pool=self._connection_pool)
         # self._single_node_connection = Redis(**self.__single_node_config)
          
