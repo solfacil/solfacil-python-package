@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "solfacil"
+name = "solkit"
 version = "0.1.0"
 description = "Solfacil Python packages and tools"
 
@@ -15,10 +15,10 @@ dependencies = [
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "solfacil"
+    "solkit"
 ]
 
 [tool.hatch.build.targets.wheel]
 include = [
-    "solfacil"
+    "solkit"
 ]
