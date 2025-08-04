@@ -41,9 +41,6 @@ class CacheRedisAdapter:
         self._cluster_connection: RedisCluster | None = None
         self._settings = settings
         
-        logger.info(f"[ADAPTER][CACHE][CONNECTION URI: {self._settings.build_uri}]")
-        logger.info(f"[ADAPTER][CACHE][CONNECTION MODE: {self._settings.deployment_mode.value.upper()}]")
-        
     @property
     def __retry_config(self) -> dict[str, Any]:
         retry_config = {
@@ -88,12 +85,13 @@ class CacheRedisAdapter:
         self._cluster_connection = RedisCluster(**self.__cluster_config)
         
     def __create_single_node_connection(self) -> Redis:
-        # self._connection_pool = ConnectionPool(**self.single_node_config)
-        # self._single_node_connection = Redis(connection_pool=self._connection_pool)
-        self._single_node_connection = Redis(**self.__single_node_config)
-        # logger.info(f"[ADAPTER][CACHE][CONNECTION POOL ACTIVE: {self._connection_pool.can_get_connection()}]")
+        self._connection_pool = ConnectionPool(**self.single_node_config)
+        self._single_node_connection = Redis(connection_pool=self._connection_pool)
+        # self._single_node_connection = Redis(**self.__single_node_config)
          
-    async def connect(self) -> None:
+    async def connect(self) -> None: 
+        logger.info(f"[ADAPTER][CACHE][CONNECTION URI: {self._settings.build_uri}]")
+        logger.info(f"[ADAPTER][CACHE][CONNECTION MODE: {self._settings.deployment_mode.value.upper()}]")
         if self._settings.deployment_mode == CacheRedisMode.CLUSTER:
             self.__create_cluster_connection()
             logger.info(f"[ADAPTER][CACHE][CONNECTION ACTIVE: {await self._cluster_connection.ping()}]")
@@ -101,6 +99,7 @@ class CacheRedisAdapter:
         else:
             self.__create_single_node_connection()
             logger.info(f"[ADAPTER][CACHE][CONNECTION ACTIVE: {await self._single_node_connection.ping()}]")
+            logger.info(f"[ADAPTER][CACHE][CONNECTION POOL ACTIVE: {self._connection_pool.can_get_connection()}]")
         
     async def __disconnect_cluster_connection(self) -> None:
         if self._cluster_connection:
