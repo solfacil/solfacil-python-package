@@ -18,12 +18,12 @@ dependencies = [
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "src"
+    "solkit"
 ]
 
 [tool.hatch.build.targets.wheel]
 include = [
-    "src"
+    "solkit"
 ]
 
 [project.optional-dependencies]
