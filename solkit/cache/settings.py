@@ -1,3 +1,4 @@
+from typing import Optional
 
 from pydantic import Field
 from pydantic.types import PositiveInt
@@ -62,11 +63,8 @@ class CacheRedisSettings(CacheRedisModeSettings):
 
 
 class CacheRedisClusterSettings(CacheRedisSettings):
-    db: int = Field(
+    db: Optional[int] = Field(
         default=0,
-        ge=1,
-        le=16,
-        description="Redis database number (1-16)",
         validation_alias="CACHE_DB"
     )
     read_from_replicas: bool = Field(
@@ -79,6 +77,12 @@ class CacheRedisClusterSettings(CacheRedisSettings):
         description="Require full cluster coverage",
         validation_alias="CACHE_REQUIRE_FULL_COVERAGE"
     )
+    
+    def validate_cluster_db(self, value: int | None) -> int | None:
+        if value is not None or value != 0:
+            raise ValueError("redis.exceptions.RedisClusterException: Argument 'db' must be 0 or None in cluster mode")
+        
+        return value
 
 
 class CacheRedisSingleNodeSettings(CacheRedisSettings):
