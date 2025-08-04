@@ -25,13 +25,6 @@ class CacheRedisSettings(CacheRedisModeSettings):
         description="Redis cluster port number",
         validation_alias="CACHE_PORT"
     )
-    db: int = Field(
-        default=0,
-        ge=0,
-        le=15,
-        description="Redis database number (0-15)",
-        validation_alias="CACHE_DB"
-    )
     max_connections: PositiveInt = Field(
         default=10,
         description="Maximum number of connections in the pool",
@@ -53,7 +46,7 @@ class CacheRedisSettings(CacheRedisModeSettings):
         validation_alias="CACHE_SOCKET_KEEPALIVE"
     )
     health_check_interval: PositiveInt = Field(
-        default=30,
+        default=10,
         description="Health check interval in seconds",
         validation_alias="CACHE_HEALTH_CHECK_INTERVAL"
     )
@@ -69,8 +62,15 @@ class CacheRedisSettings(CacheRedisModeSettings):
 
 
 class CacheRedisClusterSettings(CacheRedisSettings):
+    db: int = Field(
+        default=0,
+        ge=1,
+        le=16,
+        description="Redis database number (1-16)",
+        validation_alias="CACHE_DB"
+    )
     read_from_replicas: bool = Field(
-        default=False,
+        default=True,
         description="Allow reading from replica nodes",
         validation_alias="CACHE_READ_FROM_REPLICAS"
     )
@@ -82,6 +82,13 @@ class CacheRedisClusterSettings(CacheRedisSettings):
 
 
 class CacheRedisSingleNodeSettings(CacheRedisSettings):
+    db: int = Field(
+        default=0,
+        ge=0,
+        le=15,
+        description="Redis database number (0-15)",
+        validation_alias="CACHE_DB"
+    )
     retry_on_timeout: bool = Field(
         default=True,
         description="Retry commands on timeout",
