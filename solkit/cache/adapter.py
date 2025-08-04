@@ -36,7 +36,7 @@ class CacheRedisAdapter:
         )
         
     def __init__(self, settings: CacheRedisClusterSettings | CacheRedisSingleNodeSettings) -> None:
-        # self._connection_pool: ConnectionPool | None = None
+        self._connection_pool: ConnectionPool | None = None
         self._single_node_connection: Redis | None = None
         self._cluster_connection: RedisCluster | None = None
         self._settings = settings
@@ -87,7 +87,6 @@ class CacheRedisAdapter:
     def __create_single_node_connection(self) -> Redis:
         self._connection_pool = ConnectionPool(**self.__single_node_config)
         self._single_node_connection = Redis(connection_pool=self._connection_pool)
-        # self._single_node_connection = Redis(**self.__single_node_config)
          
     async def connect(self) -> None: 
         logger.info(f"[ADAPTER][CACHE][CONNECTION URI: {self._settings.build_uri}]")
@@ -107,8 +106,9 @@ class CacheRedisAdapter:
             self._cluster_connection = None
             
     async def __disconnect_single_node_connection(self) -> None:
-        if self._single_node_connection:
-            await self._single_node_connection.aclose()
+        if self._connection_pool:
+            await self._connection_pool.aclose()
+            self._connection_pool = None
             self._single_node_connection = None
 
     async def disconnect(self) -> None:
