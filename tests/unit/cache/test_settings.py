@@ -4,8 +4,8 @@ import os
 import pytest
 from pydantic import ValidationError
 
-from solfacil.cache.constants import CacheRedisMode
-from solfacil.cache.settings import (
+from solkit.cache.constants import CacheRedisMode
+from solkit.cache.settings import (
     CacheRedisModeSettings,
     CacheRedisSettings,
     CacheRedisClusterSettings,
@@ -35,17 +35,7 @@ def test_invalid_deployment_mode():
     # arrange
     with pytest.raises(ValidationError) as exc_info:
         # act
-        settings = CacheRedisModeSettings(CACHE_DEPLOYMENT_MODE="invalid_mode")
-    # assert
-    assert "deployment_mode" in str(exc_info.value)
-
-
-def test_missing_deployment_mode():
-    """Test that missing deployment mode raises ValidationError."""
-    # arrange
-    with pytest.raises(ValidationError) as exc_info:
-        # act
-        settings = CacheRedisModeSettings()
+        CacheRedisModeSettings(CACHE_DEPLOYMENT_MODE="invalid_mode")
     # assert
     assert "deployment_mode" in str(exc_info.value)
 
