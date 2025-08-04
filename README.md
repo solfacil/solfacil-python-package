@@ -1,8 +1,8 @@
 
-# Solfacil Python Packages
+# Solkit - Solfacil Python Packages
 
 ## Installation
 
 ```bash
-pip install git+https://git@github.com/solfacil/solfacil-python-package.git@main
+pip install git+https://git@github.com/solfacil/ccoe.sup.solkit.git@main
 ```
