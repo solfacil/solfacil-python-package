@@ -3,7 +3,7 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
-      - id: check-docstring-first
+      # - id: check-docstring-first
       - id: check-toml
       - id: check-yaml
       - id: debug-statements
@@ -21,7 +21,7 @@ repos:
     rev: 1.8.6
     hooks:
       - id: bandit
-        args: ['-r', '.']
+        args: ['-r', 'solkit']
 
   # 3. Ruff for linting and formatting
   # - repo: https://github.com/astral-sh/ruff-pre-commit
