@@ -1,0 +1,11 @@
+{
+    "pythonVersion": "3.12",
+    "pythonPlatform": "Linux",
+    "include": [
+        "solkit"
+    ],
+    "root": "solkit",
+    "exclude": [
+        "**/__pycache__",
+    ]
+}

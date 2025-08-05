@@ -1,0 +1,20 @@
+line-length = 120
+lint.select = [
+    "E",   # pycodestyle
+    "F",   # Pyflakes
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "I",   # isort
+    "ANN", # annotations
+    "S",   # bandit
+    "D",   # pydocstyle
+
+]
+lint.ignore = ["B008", "D100"]          # flake8-bugbear: do not use bare except
+lint.extend-safe-fixes = ["SIM", "I"]   # flake8-simplify and isort
+lint.pydocstyle.convention = "google"
+format.quote-style = "single"
+format.indent-style = "space"
+format.docstring-code-format = true
+format.docstring-code-line-length = 60
