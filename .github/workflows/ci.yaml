@@ -38,4 +38,3 @@ jobs:
       - name: Pyright - Typecheck
         run: |
           pyright --verifytypes solkit
-
