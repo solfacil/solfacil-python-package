@@ -1,9 +1,9 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class BrokerKafkaAcks(Enum):
+class BrokerKafkaAcks(StrEnum):
     """Valid values for Kafka Producer ACKS."""
     
     ALL = "all"
-    ZERO = 0
-    ONE = 1
+    ZERO = "0"
+    ONE = "1"
