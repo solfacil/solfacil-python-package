@@ -39,7 +39,7 @@ class BrokerKafkaAdapter:
         self._producer = AIOKafkaProducer(
             bootstrap_servers=self._producer_settings.bootstrap_servers,
             request_timeout_ms=self._producer_settings.request_timeout_ms,
-            acks=self._producer_settings.acks,
+            acks=str(self._producer_settings.acks),
             connections_max_idle_ms=self._producer_settings.connections_max_idle_ms,
         )
     
