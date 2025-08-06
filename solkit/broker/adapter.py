@@ -54,6 +54,8 @@ class BrokerKafkaAdapter:
     #    )
     
     async def __start_producer(self) -> None:
+        logger.info(f"[ADAPTER][BROKER][BOOTSTRAP SERVERS: {self._producer_settings.bootstrap_servers}]")
+        logger.info(f"[ADAPTER][BROKER][ACKS: {self._producer_settings.acks}]")
         self.__create_producer()
         await self._producer.start()
     
