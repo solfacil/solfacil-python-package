@@ -11,7 +11,7 @@ class BrokerKafkaSettings(BaseSettings):
         validation_alias="BROKER_BOOTSTRAP_SERVERS"
     )
     request_timeout_ms: int = Field(
-        default=...,
+        default=5000,
         description="Kafka request timeout ms",
         validation_alias="BROKER_REQUEST_TIMEOUT_MS"
     )
@@ -77,12 +77,12 @@ class BrokerKafkaConsumerSettings(BrokerKafkaSettings):
 
 class BrokerKafkaProducerSettings(BrokerKafkaSettings):
     acks: BrokerKafkaAcks = Field(
-        default=...,
+        default=BrokerKafkaAcks.ALL,
         description="Kafka acks",
         validation_alias="BROKER_ACKS"
     )
     connections_max_idle_ms: int = Field(
-        default=...,
+        default=10000,
         description="Kafka connections max idle ms",
         validation_alias="BROKER_CONNECTIONS_MAX_IDLE_MS"
     )
