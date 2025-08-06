@@ -86,3 +86,7 @@ class BrokerKafkaProducerSettings(BrokerKafkaSettings):
         description="Kafka connections max idle ms",
         validation_alias="BROKER_CONNECTIONS_MAX_IDLE_MS"
     )
+
+    def parsed_acks(self) -> int | str:
+        """Parse ACKS value to return 0 or 1 as int and 'all' as string."""
+        return str(self.acks.value) if self.acks == BrokerKafkaAcks.ALL else int(self.acks.value)
