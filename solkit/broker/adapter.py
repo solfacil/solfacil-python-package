@@ -15,7 +15,7 @@ class BrokerKafkaAdapter:
     #    return cls(consumer_settings=consumer_settings)
     
     @classmethod
-    def config_producer(cls) -> "BrokerKafkaAdapter":
+    def producer_config(cls) -> "BrokerKafkaAdapter":
         producer_settings = BrokerKafkaProducerSettings()
         return cls(producer_settings=producer_settings)
     
