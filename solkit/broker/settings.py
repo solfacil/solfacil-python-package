@@ -24,7 +24,7 @@ class BrokerKafkaSettings(BaseSettings):
 class BrokerKafkaConsumerSettings(BrokerKafkaSettings):
     """Consumer settings for Kafka."""
     
-    topics: list[str] = Field(
+    topics: str = Field(
         default=...,
         description="Kafka topics",
         validation_alias="BROKER_TOPICS"
@@ -77,11 +77,10 @@ class BrokerKafkaConsumerSettings(BrokerKafkaSettings):
     #     validation_alias="BROKER_ISOLATION_LEVEL"
     # )
     
-    @field_validator("topics", mode="before")
-    @classmethod
-    def validate_topics(cls, value: str) -> list[str]:
-        """Validate topics."""
-        return value.split(",") if value.find(",") > 0 else [value]
+
+    def parsed_topics(self) -> list[str]:
+        """Parse topics."""
+        return self.topics.split(",") if self.topics.find(",") > 0 else [self.topics]
         
     @model_validator(mode="after")
     def validate_kafka_consumer_timeouts(self) -> Self:
