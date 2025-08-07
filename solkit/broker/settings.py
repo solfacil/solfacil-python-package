@@ -1,6 +1,6 @@
 from typing import Self
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_validator, field_validator
 from pydantic_settings import BaseSettings
 
 from .contants import BrokerKafkaAcks
@@ -77,6 +77,12 @@ class BrokerKafkaConsumerSettings(BrokerKafkaSettings):
     #     validation_alias="BROKER_ISOLATION_LEVEL"
     # )
     
+    @field_validator("topics", mode="before")
+    @classmethod
+    def validate_topics(cls, value: str) -> list[str]:
+        """Validate topics."""
+        return value.split(",") if value.find(",") > 0 else [value]
+        
     @model_validator(mode="after")
     def validate_kafka_consumer_timeouts(self) -> Self:
         """Validate Kafka consumer timeouts.
