@@ -45,7 +45,7 @@ class BrokerKafkaAdapter:
     
     def __create_consumer(self) -> None:
         self._consumer = AIOKafkaConsumer(
-            self._consumer_settings.parsed_topics(),
+            *self._consumer_settings.parsed_topics(),
             bootstrap_servers=self._consumer_settings.bootstrap_servers,
             request_timeout_ms=self._consumer_settings.request_timeout_ms,
             group_id=self._consumer_settings.group_id,
