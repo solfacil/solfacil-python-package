@@ -65,7 +65,7 @@ class BrokerKafkaAdapter:
         self.__create_consumer()
         await self._consumer.start()
         logger.info(f"[ADAPTER][BROKER][TOPICS: {await self._consumer.topics()}]")
-        logger.info(f"[ADAPTER][BROKER][ASSIGNED PARTITIONS: {self._consumer.assignment()}]")
+        # logger.info(f"[ADAPTER][BROKER][ASSIGNED PARTITIONS: {self._consumer.assignment()}]")
         
     
     async def connect(self) -> None:

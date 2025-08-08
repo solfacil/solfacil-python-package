@@ -1,6 +1,6 @@
 from typing import Self
 
-from pydantic import Field, model_validator, field_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings
 
 from .contants import BrokerKafkaAcks
@@ -77,7 +77,6 @@ class BrokerKafkaConsumerSettings(BrokerKafkaSettings):
     #     validation_alias="BROKER_ISOLATION_LEVEL"
     # )
     
-
     def parsed_topics(self) -> list[str]:
         """Parse topics."""
         return self.topics.split(",") if self.topics.find(",") > 0 else [self.topics]

@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Callable
 
 from .adapter import BrokerKafkaAdapter
 
@@ -15,6 +15,10 @@ class BrokerRepository:
     async def produce(self, topic: str, message: dict[str, Any]) -> None:
         return await self._adapter._producer.send_and_wait(topic, self.__parse_message(message))
     
+    async def consume(self, func: Callable) -> None:
+        async for message in self._adapter._consumer:
+            await func(message)
+
     # async def healthcheck(self) -> None:
     #     producer = await self._adapter._producer.send_and_wait("healthcheck", "healthcheck")
     #     consumer = self._adapter._consumer.subscription()  # list topics subscribed
